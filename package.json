@@ -1,5 +1,5 @@
 {
-  "name": "simple-ovpn3-client-gui",
+  "name": "ovpn3-client-gui",
   "private": true,
   "version": "0.0.0",
   "type": "module",
