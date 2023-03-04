@@ -19,32 +19,35 @@
   }
 
   async function getConfigsList() {
-    const configs = await new Command("ovpn3", "configs-list").execute();
-    const stringConfigs = configs.stdout;
+    const cmdConfigs = await new Command("ovpn3", "configs-list").execute();
 
     // 0: header, 1: configs, 2: empty
-    const arrayConfigs = stringConfigs.split(/-+/)[1];
+    const stringConfigs = cmdConfigs.stdout.split(/\n*-+\n*/)[1];
 
-    const infoConfigs = [
-      ...arrayConfigs.matchAll(
-        /(.+)\n([\w\s:]{24})?\s*(?!\d)([\w\s:]{24})?\s*(\d+)\n((\w+\s{0,2}\.*)+)\s*(.+)/g
-      ),
-    ];
+    // separate by 2+ \n
+    const arrayConfigs = stringConfigs.split(/\n{2,}/);
 
-    console.log(infoConfigs);
+    // convert array of strings to array of objects
+    const arrayObjConfigs = arrayConfigs.map((stringConfig) => {
+      const arrayValues = [
+        ...stringConfig.matchAll(
+          /(.+)\n(\w[\w\d :]{23})? +(\w[\w\d :]{23})? +(\d+)\n((\w+\s{0,2}\.*)+)\s*(.+)/g
+        ),
+      ][0]; // get the first (and only) group of matches
 
-    // const arrayConfigs = stringConfigs
-    //   .split(/-+/)
-    //   .map((x) => x.split("\n"))
-    //   .flat()
-    //   .map((x) => x.split(/[ ]{2,}/))
-    //   .flat()
-    //   .filter((x) => x.length != 0);
+      const obj = {
+        configuration_path: arrayValues[1],
+        imported: arrayValues[2],
+        last_used: arrayValues[3],
+        used: arrayValues[4],
+        name: arrayValues[5],
+        owner: arrayValues[7],
+      };
 
-    // console.log("stringConfigs");
-    // console.log(stringConfigs);
-    // console.log("configs");
-    // console.log(arrayConfigs);
+      return obj;
+    });
+
+    return arrayObjConfigs;
   }
 </script>
 
