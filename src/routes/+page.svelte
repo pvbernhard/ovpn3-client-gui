@@ -24,6 +24,11 @@
     // 0: header, 1: configs, 2: empty
     const stringConfigs = cmdConfigs.stdout.split(/\n*-+\n*/)[1];
 
+    // if there's no config
+    if (stringConfigs.length == 0) {
+      return null;
+    }
+
     // separate by 2+ \n
     const arrayConfigs = stringConfigs.split(/\n{2,}/);
 
